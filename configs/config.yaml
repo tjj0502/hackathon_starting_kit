@@ -1,0 +1,28 @@
+# General configutation
+device: cuda
+seed: 0
+gpu_id : "1"
+train: True
+# n_lags, length of the time series, STOCKs:20
+n_lags: 20
+
+data_dir: 'data/'
+
+algo: RCGAN
+generator: LSTM
+discriminator: LSTM
+
+#hyperparameters:
+lr_G: 0.002
+lr_D: 0.003
+D_steps_per_G_step: 3
+batch_size: 64
+steps: 5 # Turn to 10**5 for better performance
+#generator hyperparameter:
+G_input_dim: 5 # Noise dimension
+G_hidden_dim: 64
+G_num_layers: 2
+init_fixed: False
+#discriminator hyperparameter:
+D_hidden_dim: 32
+D_num_layers: 3

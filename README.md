@@ -2,9 +2,10 @@
 
 In this repository, we provide a standard pipeline to help you with the kick off of our hackathon. In this pipeline,
 we include: 
-1) the model build-up for both the generator and discriminator using LSTM modules,
-2) training algorithm design,
-3) offline evaluation module.
+1) data importation and explanatory analysis,
+2) the model build-up for both the generator and discriminator using LSTM modules,
+3) training algorithm design,
+4) offline evaluation module.
 
 The data used for training and testing all come from the public data from the main hackathon website,
 
