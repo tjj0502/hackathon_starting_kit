@@ -2,6 +2,8 @@ import os
 
 import torch
 import torch.nn as nn
+import pickle
+import numpy as np
 
 """
 This is a sample file, user must provide a python function named init_generator(), 
@@ -10,8 +12,8 @@ which initializes an instance of the generator and loads the model parameter fro
 
 
 print(os.path.abspath(__file__))
-PATH_TO_MODEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'model_dict.pt')
-PATH_TO_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fake.pt')
+PATH_TO_MODEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'model_dict.pkl')
+PATH_TO_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fake.pkl')
 
 
 def init_weights(m):
@@ -92,7 +94,10 @@ def init_generator():
                             n_layers=config["G_num_layers"],
                             init_fixed = True)
     print("Loading the model.")
-    generator.load_state_dict(torch.load(PATH_TO_MODEL))
+    # Load from .pkl
+    with open(PATH_TO_MODEL, "rb") as f:
+        model_param = pickle.load(f)
+    generator.load_state_dict(model_param)
     generator.eval()
     return generator
 
