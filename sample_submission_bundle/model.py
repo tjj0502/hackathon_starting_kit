@@ -4,7 +4,8 @@ import torch
 import torch.nn as nn
 
 """
-This is a sample file, user must provide a python class named Generator, 
+This is a sample file, user must provide a python function named init_generator(), 
+which initializes an instance of the generator and loads the model parameter from model_dict.pt, returning the trained model. 
 """
 
 
