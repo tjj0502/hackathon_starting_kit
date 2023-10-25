@@ -7,6 +7,7 @@ import os
 from os import path as pt
 from src.evaluations.evaluations import fake_loader, full_evaluation
 import torch
+import pickle
 from src.utils import get_experiment_dir, set_seed
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -30,8 +31,9 @@ def main(config):
     else:
         config.update({"device": "cpu"}, allow_val_change=True)
 
-    training_set = TensorDataset(
-            torch.load(config.data_dir + 'ref_data.pt').to(config.device).to(torch.float))
+    with open(config.data_dir + "ref_data.pkl", "rb") as f:
+        loaded_array = pickle.load(f)
+    training_set = torch.tensor(loaded_array).to(config.device).to(torch.float)
 
     train_dl = DataLoader(
         training_set,
@@ -73,21 +75,20 @@ def main(config):
     generator.load_state_dict(torch.load(pt.join(
         config.exp_dir, 'generator_state_dict.pt')))
 
-    # Use ref data to produce res_data
-    test_set = TensorDataset(
-        torch.load(config.data_dir + 'res_data.pt').to(config.device).to(torch.float))
+    # Load validation dataset
+    with open(config.data_dir + "val_data.pkl", "rb") as f:
+        validation_set = pickle.load(f)
 
-    test_dl = DataLoader(
-        test_set,
-        batch_size=config.batch_size,
-        shuffle=True
-    )
+    generator.eval()
+    with torch.no_grad():
+        fake_dataset = generator(len(validation_set), config.n_lags,
+                                 device='cpu').numpy()
 
-    fake_test_dl = fake_loader(generator, num_samples=len(test_dl.dataset),
-                               n_lags=config.n_lags, batch_size=test_dl.batch_size, algo=config.algo
-                               )
+    # Save fake dataset
+    with open(config.data_dir + "fake_data.pkl", "wb") as f:
+        pickle.dump(fake_dataset, f)
 
-    res_dict = full_evaluation(test_dl, fake_test_dl, config)
+    res_dict = full_evaluation(validation_set, fake_dataset, config)
     for k, v in res_dict.items():
         print(k, v)
 

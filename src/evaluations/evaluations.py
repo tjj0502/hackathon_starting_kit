@@ -407,13 +407,13 @@ def compute_predictive_score(real_train_dl, real_test_dl, fake_train_dl, fake_te
     std_loss = np.std(np.array(test_loss_list))
     return mean_loss, std_loss
 
-def full_evaluation(real_dl, fake_dl, config):
+def full_evaluation(real_array, fake_array, config):
     """ evaluation for the synthetic generation, including.
         1) Stylized facts: marginal distribution, cross-correlation, autocorrelation, covariance scores.
         2) Implicit scores: discriminative score, predictive score.
     Args:
-        real_dl (_type_): torch.dataloader
-        fake_dl (_type_): torch..dataloader
+        real_array (_type_): np.array
+        fake_array (_type_): np.array
     """
     d_scores = []
     p_scores = []
@@ -422,8 +422,8 @@ def full_evaluation(real_dl, fake_dl, config):
     cov_losses = []
     acf_losses = []
 
-    real_data = loader_to_tensor(real_dl).to(config.device).to(torch.float)
-    fake_data = loader_to_tensor(fake_dl).to(config.device).to(torch.float)
+    real_data = torch.tensor(real_array).to(config.device).to(torch.float)
+    fake_data = torch.tensor(fake_array).to(config.device).to(torch.float)
 
     set_size = int(0.8 * real_data.shape[0])
 
