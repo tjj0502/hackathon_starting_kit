@@ -4,7 +4,8 @@ import torch
 import torch.nn as nn
 
 """
-This is a sample file, user must provide a python class named Generator, 
+This is a sample file, user must provide a python function named init_generator(), 
+which initializes an instance of the generator and loads the model parameter from model_dict.pt, returning the trained model. 
 """
 
 
@@ -93,13 +94,11 @@ def init_generator():
     print("Loading the model.")
     generator.load_state_dict(torch.load(PATH_TO_MODEL))
     generator.eval()
+    return generator
+
+if __name__ == '__main__':
+    generator = init_generator()
     print("Generator loaded. Generate fake data.")
     with torch.no_grad():
         fake_data = generator(2000, 20, 'cpu')
-    return fake_data
-
-if __name__ == '__main__':
-    fake_data = init_generator()
-    torch.save(fake_data, PATH_TO_DATA)
-    print("Data loaded: ")
-    print(torch.load(PATH_TO_DATA)[0,0:10,:])
+    print(fake_data[0,0:10,:])
