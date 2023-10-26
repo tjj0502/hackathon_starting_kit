@@ -35,7 +35,7 @@ class GeneratorBase(nn.Module):
         self.output_dim = output_dim
 
     # @abstractmethod
-    def forward_(self, batch_size: int, n_lags: int, device: str):
+    def forward_(self, batch_size: int, ts_length: int, device: str):
         """ Implement here generation scheme. """
         # ...
         pass
@@ -60,12 +60,10 @@ class TSGenerator(GeneratorBase):
 
         self.init_fixed = init_fixed
 
-    def forward(self, batch_size: int, n_lags: int, device: str, z=None) -> torch.Tensor:
-        if z is None:
-            z = (0.1 * torch.randn(batch_size, n_lags,
-                                   self.input_dim)).to(device)  # cumsum(1)
-        else:
-            pass
+    def forward(self, batch_size: int, ts_length: int, device: str) -> torch.Tensor:
+        z = (0.1 * torch.randn(batch_size, ts_length,
+                               self.input_dim)).to(device)  # cumsum(1)
+
         if self.init_fixed:
             h0 = torch.zeros(self.rnn.num_layers, batch_size,
                              self.rnn.hidden_size).to(device)
@@ -78,7 +76,7 @@ class TSGenerator(GeneratorBase):
         h1, _ = self.rnn(z, (h0, c0))
         x = self.linear(h1)
 
-        assert x.shape[1] == n_lags
+        assert x.shape[1] == ts_length
         return x
 
 def init_generator():
@@ -105,5 +103,5 @@ if __name__ == '__main__':
     generator = init_generator()
     print("Generator loaded. Generate fake data.")
     with torch.no_grad():
-        fake_data = generator(2000, 20, 'cpu')
+        fake_data = generator(batch_size = 2000, ts_length = 20, device = 'cpu')
     print(fake_data[0,0:10,:])
