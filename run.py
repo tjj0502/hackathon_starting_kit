@@ -71,7 +71,8 @@ def main(config):
     from src.baselines.models import GENERATORS
 
     generator = GENERATORS[config.generator](
-        input_dim=config.G_input_dim, hidden_dim=config.G_hidden_dim, output_dim=config.input_dim, n_layers=config.G_num_layers, init_fixed=config.init_fixed)
+        input_dim=config.G_input_dim, hidden_dim=config.G_hidden_dim, output_dim=config.input_dim,
+        n_layers=config.G_num_layers, init_fixed=config.init_fixed)
     generator.load_state_dict(torch.load(pt.join(
         config.exp_dir, 'generator_state_dict.pt')))
 

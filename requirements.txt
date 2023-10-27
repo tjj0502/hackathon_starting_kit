@@ -1,7 +1,7 @@
-matplotlib == 3.5.2
-ml_collections == 0.1.1
-numpy
-PyYAML == 6.0
+matplotlib==3.5.2
+ml_collections==0.1.1
+numpy>=1.21.0
+PyYAML==6.0
 tqdm==4.64.0
 wfdb==3.4.1
 fbm==0.3.0

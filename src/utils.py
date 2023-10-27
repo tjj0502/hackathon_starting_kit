@@ -1,12 +1,10 @@
-from torch.nn.functional import one_hot
+import numpy as np
+import os
+import pickle
 import torch
 import torch.nn as nn
-import numpy as np
-import pickle
-import os
 from ml_collections.config_dict import ConfigDict
-# import cupy
-
+from torch.nn.functional import one_hot
 
 def to_numpy(x):
     """
@@ -19,7 +17,6 @@ def to_numpy(x):
 
 def count_parameters(model: torch.nn.Module) -> int:
     """
-
     Args:
         model (torch.nn.Module): input models
     Returns:
@@ -29,24 +26,7 @@ def count_parameters(model: torch.nn.Module) -> int:
 
 
 def get_time_vector(size: int, length: int) -> torch.Tensor:
-    return torch.linspace(1/length, 1, length).reshape(1, -1, 1).repeat(size, 1, 1)
-
-
-"""
-class BaseAugmentation:
-    pass
-
-    def apply(self, *args: List[torch.Tensor]) -> torch.Tensor:
-        raise NotImplementedError('Needs to be implemented by child.')
-
-
-@dataclass
-class AddTime(BaseAugmentation):
-
-    def apply(self, x: torch.Tensor):
-        t = get_time_vector(x.shape[0], x.shape[1]).to(x.device)
-        return torch.cat([t, x], dim=-1)
-"""
+    return torch.linspace(1 / length, 1, length).reshape(1, -1, 1).repeat(size, 1, 1)
 
 
 def AddTime(x):
@@ -64,15 +44,6 @@ def AddTime(x):
     return torch.cat([t, x], dim=-1)
 
 
-def to_numpy(x):
-    """
-    Casts torch.Tensor to a numpy ndarray.
-
-    The function detaches the tensor from its gradients, then puts it onto the cpu and at last casts it to numpy.
-    """
-    return x.detach().cpu().numpy()
-
-
 def set_seed(seed: int, device='cpu'):
     """ Sets the seed to a specified value. Needed for reproducibility of experiments. """
     torch.manual_seed(seed)
@@ -83,6 +54,7 @@ def set_seed(seed: int, device='cpu'):
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
+
 
 def save_obj(obj: object, filepath: str):
     """ Generic function to save an object with different methods. """
@@ -154,6 +126,7 @@ def loader_to_cond_tensor(dl, config):
 
     return one_hot(torch.cat(tensor), config.num_classes).unsqueeze(1).repeat(1, config.n_lags, 1)
 
+
 def combine_dls(dls):
     return torch.cat([loader_to_tensor(dl) for dl in dls])
 
@@ -161,6 +134,7 @@ def combine_dls(dls):
 def is_multivariate(x: torch.Tensor):
     """ Check if the path / tensor is multivariate. """
     return True if x.shape[-1] > 1 else False
+
 
 def convert_config_to_dict(config):
     """
