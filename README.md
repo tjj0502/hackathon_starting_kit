@@ -2,7 +2,7 @@
 
 In this repository, we provide a standard pipeline to help you with the kick off of our hackathon. In this pipeline,
 we include: 
-1) data importation and explanatory analysis,
+1) data importing and explanatory analysis,
 2) the model build-up for both the generator and discriminator using LSTM modules,
 3) training algorithm design,
 4) offline evaluation module.
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 For code illustration, please take a closer look on the Jupyter-Notebook we created, namely, example_pipeline.ipynb.
 
 ## Data
-The training data for this challenge can be found at [data/ref_data.pkl](data/). It consists of $20000$ samples of the price and volatility process of $2$ correlated assets. Each sample path is sampled uniformly from $[0, 1]$ with $20$ time steps. We provide both the trajectories of the price and volatility process forming a time series of feature dimension $4$ corresponding to [price_asset_1, volatility_asset_1, price_asset_2, volatility_asset_2], the data is stored in a .pkl file and the data shape is $[20000, 20, 4]$.
+For this challenge, the training data is located at [data/ref_data.pkl](data/). This data includes `20000` sample paths representing the price and volatility processes of `2` correlated assets. Each sample path is sampled uniformly from `[0, 1]` with `20` time steps. The dataset provides trajectories for both the price and volatility processes, resulting in a time series with feature dimensions such as `[price_asset_1, volatility_asset_1, price_asset_2, volatility_asset_2]`, the data is stored in a `.pkl` file and the data shape is `[20000, 20, 4]`.
 
 ## Sample submission
 We also provide a sample submission bundle at [sample_submission_bundle](sample_submission_bundle/) which includes: 
