@@ -6,6 +6,7 @@ from src.utils import loader_to_tensor, to_numpy
 from src.evaluations.test_metrics import CrossCorrelLoss, HistoLoss, CovLoss, ACFLoss
 import numpy as np
 
+
 def _train_classifier(model, train_loader, test_loader, config, epochs=100):
     """
     Train a NN-based classifier to obtain the discriminative score
@@ -37,7 +38,7 @@ def _train_classifier(model, train_loader, test_loader, config, epochs=100):
     best_loss = 999
     criterion = torch.nn.CrossEntropyLoss()
     # wandb.watch(model, criterion, log="all", log_freq=1)
-    for epoch in range(epochs):
+    for _ in range(epochs):
         # print("Epoch {}/{}".format(epoch + 1, epochs))
         # print("-" * 30)
         for phase in ["train", "validation"]:
@@ -125,7 +126,6 @@ def _test_classifier(model, test_loader, config):
     with torch.no_grad():
         # Iterate through data
         for inputs, labels in test_loader:
-
             inputs = inputs.to(device)
             labels = labels.to(device)
 
@@ -174,7 +174,7 @@ def _train_regressor(model, train_loader, test_loader, config, epochs=100):
     dataloader = {'train': train_loader, 'validation': test_loader}
     criterion = torch.nn.L1Loss()
 
-    for epoch in range(epochs):
+    for _ in range(epochs):
         # print("Epoch {}/{}".format(epoch + 1, epochs))
         # print("-" * 30)
         for phase in ["train", "validation"]:
@@ -189,7 +189,6 @@ def _train_regressor(model, train_loader, test_loader, config, epochs=100):
                 labels = labels.to(device)
 
                 optimizer.zero_grad()
-                train = phase == "train"
                 with torch.set_grad_enabled(True):
                     # FwrdPhase:
                     # inputs = torch.dropout(inputs, config.dropout_in, train)
@@ -207,7 +206,6 @@ def _train_regressor(model, train_loader, test_loader, config, epochs=100):
             # print("{} Loss: {:.4f}".format(phase, epoch_loss))
 
         if phase == "validation" and epoch_loss <= best_loss:
-
             best_loss = epoch_loss
             best_model_wts = copy.deepcopy(model.state_dict())
 
@@ -249,7 +247,6 @@ def _test_regressor(model, test_loader, config):
     with torch.no_grad():
         # Iterate through data
         for inputs, labels in test_loader:
-
             inputs = inputs.to(device)
             labels = labels.to(device)
 
@@ -301,7 +298,6 @@ def fake_loader(generator, num_samples, n_lags, batch_size, algo, **kwargs):
 
 def compute_discriminative_score(real_train_dl, real_test_dl, fake_train_dl, fake_test_dl, config,
                                  hidden_size=64, num_layers=2, epochs=30, batch_size=512):
-
     def create_dl(real_dl, fake_dl, batch_size):
         train_x, train_y = [], []
         for data in real_dl:
@@ -339,7 +335,7 @@ def compute_discriminative_score(real_train_dl, real_test_dl, fake_train_dl, fak
         test_acc_list.append(test_acc)
     mean_acc = np.mean(np.array(test_acc_list))
     std_acc = np.std(np.array(test_acc_list))
-    return abs(mean_acc-0.5), std_acc
+    return abs(mean_acc - 0.5), std_acc
 
 
 def compute_classfication_score(real_train_dl, fake_train_dl, config,
@@ -354,6 +350,7 @@ def compute_classfication_score(real_train_dl, fake_train_dl, config,
         def forward(self, x):
             x = self.rnn(x)[0][:, -1]
             return self.linear(x)
+
     model = Discriminator(
         real_train_dl.dataset[0][0].shape[-1], hidden_size, num_layers, out_size=config.num_classes)
     TFTR_acc = _train_classifier(
@@ -369,7 +366,7 @@ def compute_predictive_score(real_train_dl, real_test_dl, fake_train_dl, fake_te
         x, y = [], []
         _, T, C = next(iter(train_dl))[0].shape
 
-        T_cutoff = int(T/10)
+        T_cutoff = int(T / 10)
         for data in train_dl:
             x.append(data[0][:, :-T_cutoff])
             y.append(data[0][:, -T_cutoff:].reshape(data[0].shape[0], -1))
@@ -382,6 +379,7 @@ def compute_predictive_score(real_train_dl, real_test_dl, fake_train_dl, fake_te
             x.size()), y[idx].view(y.size())), batch_size=batch_size)
 
         return dl
+
     train_dl = create_dl(fake_train_dl, fake_test_dl, batch_size)
     test_dl = create_dl(real_train_dl, real_test_dl, batch_size)
 
@@ -407,6 +405,7 @@ def compute_predictive_score(real_train_dl, real_test_dl, fake_train_dl, fake_te
     std_loss = np.std(np.array(test_loss_list))
     return mean_loss, std_loss
 
+
 def full_evaluation(real_array, fake_array, config):
     """ evaluation for the synthetic generation, including.
         1) Stylized facts: marginal distribution, cross-correlation, autocorrelation, covariance scores.
@@ -427,10 +426,10 @@ def full_evaluation(real_array, fake_array, config):
 
     set_size = int(0.8 * real_data.shape[0])
 
-    real_data_train = real_data[:set_size,:,:]
-    real_data_test = real_data[set_size:,:,:]
-    fake_data_train = fake_data[:set_size,:,:]
-    fake_data_test = fake_data[set_size:,:,:]
+    real_data_train = real_data[:set_size, :, :]
+    real_data_test = real_data[set_size:, :, :]
+    fake_data_train = fake_data[:set_size, :, :]
+    fake_data_test = fake_data[set_size:, :, :]
 
     real_train_dl = DataLoader(TensorDataset(real_data_train), batch_size=128)
     real_test_dl = DataLoader(TensorDataset(real_data_test), batch_size=128)

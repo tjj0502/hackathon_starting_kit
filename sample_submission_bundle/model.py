@@ -1,15 +1,14 @@
+"""
+This is a sample file, user must provide a python function named init_generator() which:
+    - initializes an instance of the generator,
+    - loads the model parameters from model_dict.py,
+    - returns the model.
+"""
+import numpy as np
 import os
-
+import pickle
 import torch
 import torch.nn as nn
-import pickle
-import numpy as np
-
-"""
-This is a sample file, user must provide a python function named init_generator(), 
-which initializes an instance of the generator and loads the model parameter from model_dict.pt, returning the trained model. 
-"""
-
 
 print(os.path.abspath(__file__))
 PATH_TO_MODEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'model_dict.pkl')
@@ -18,10 +17,8 @@ PATH_TO_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fake.pk
 
 def init_weights(m):
     if isinstance(m, nn.Linear):
-        nn.init.xavier_uniform_(
-            m.weight.data, gain=nn.init.calculate_gain('relu'))
+        nn.init.xavier_uniform_(         m.weight.data, gain=nn.init.calculate_gain('relu'))
         try:
-            # m.bias.zero_()#, gain=nn.init.calculate_gain('relu'))
             nn.init.zeros_(m.bias)
         except:
             pass
@@ -34,7 +31,6 @@ class GeneratorBase(nn.Module):
         self.input_dim = input_dim
         self.output_dim = output_dim
 
-    # @abstractmethod
     def forward_(self, batch_size: int, ts_length: int, device: str):
         """ Implement here generation scheme. """
         # ...
@@ -50,6 +46,7 @@ class TSGenerator(GeneratorBase):
     """
     Sample generator class
     """
+
     def __init__(self, input_dim: int, output_dim: int, hidden_dim: int, n_layers: int, init_fixed: bool = True):
         super(TSGenerator, self).__init__(input_dim, output_dim)
         # LSTM
@@ -79,6 +76,7 @@ class TSGenerator(GeneratorBase):
         assert x.shape[1] == ts_length
         return x
 
+
 def init_generator():
     print("Initialisation of the model.")
     config = {
@@ -90,7 +88,7 @@ def init_generator():
                             hidden_dim=config["G_hidden_dim"],
                             output_dim=4,
                             n_layers=config["G_num_layers"],
-                            init_fixed = True)
+                            init_fixed=True)
     print("Loading the model.")
     # Load from .pkl
     with open(PATH_TO_MODEL, "rb") as f:
@@ -99,9 +97,10 @@ def init_generator():
     generator.eval()
     return generator
 
+
 if __name__ == '__main__':
     generator = init_generator()
     print("Generator loaded. Generate fake data.")
     with torch.no_grad():
-        fake_data = generator(batch_size = 2000, ts_length = 20, device = 'cpu')
-    print(fake_data[0,0:10,:])
+        fake_data = generator(batch_size=2000, ts_length=20, device='cpu')
+    print(fake_data[0, 0:10, :])
